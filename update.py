@@ -37,7 +37,7 @@ class RecentChangeUpdater(object):
     def _wiki_execute(self, query, params, as_dict=False):
         if as_dict:
             wiki_cursor = self.wiki_connect.cursor(oursql.DictCursor)
-        else: 
+        else:
             wiki_cursor = self.wiki_connect.cursor()
         try:
             wiki_cursor.execute(query, params)
@@ -50,7 +50,7 @@ class RecentChangeUpdater(object):
     def _ht_execute(self, query, params, as_dict=False):
         if as_dict:
             ht_cursor = self.ht_connect.cursor(oursql.DictCursor)
-        else: 
+        else:
             ht_cursor = self.ht_connect.cursor()
         try:
             ht_cursor.execute(query, params)
@@ -111,7 +111,7 @@ class RecentChangeUpdater(object):
             print 'Tags: %s new (of %s)' % (self.stats['tags_added'], self.stats['total_tags'])
             print 'Changes: %s new (of %s)' % (self.stats['changes_added'], self.stats['total_changes'])
         return self.stats
-            
+
     def add_recentchange(self, rc):
         query = '''
             SELECT htrc_id
@@ -125,13 +125,13 @@ class RecentChangeUpdater(object):
         if htrc_id:
             return htrc_id[0][0]
         query = '''
-            INSERT INTO recentchanges 
+            INSERT INTO recentchanges
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
         params = (None, self.lang) + rc
         cursor = self._ht_execute(query, params)
         self.stats['changes_added'] += 1
         return cursor.lastrowid
-        
+
     def get_ht_id(self, hashtag):
         query = '''
             SELECT ht_id, ht_update_timestamp
@@ -151,7 +151,7 @@ class RecentChangeUpdater(object):
             self.ht_id_map[hashtag] = ht_res[0][0]
             if ht_res[0][1] < rc_timestamp:
                 query = '''
-                    UPDATE hashtags 
+                    UPDATE hashtags
                     SET ht_update_timestamp = ?
                     WHERE ht_text = ?'''
                 params = (rc_timestamp, hashtag)
@@ -160,7 +160,7 @@ class RecentChangeUpdater(object):
             return self.ht_id_map[hashtag]
         query = '''
             INSERT INTO hashtags
-            VALUES (?, ?, NOW(), ?)'''
+            VALUES (?, ?, NOW() + 0, ?)'''
         params = (None, hashtag, rc_timestamp)
         cursor = self._ht_execute(query, params)
         self.ht_id_map[hashtag] = cursor.lastrowid  # Why does this return None?
