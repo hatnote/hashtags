@@ -80,6 +80,7 @@ class RecentChangeUpdater(object):
         for change in changes:
             change = RecentChangesModel(*change)
             hashtags = find_hashtags(change.rc_comment)
+            hashtags = [hashtag.lower() for hashtag in hashtags]
             htrc_id = self.add_recentchange(change)
             self.htrc_id_map[htrc_id] = hashtags
             for hashtag in hashtags:
