@@ -9,7 +9,6 @@
 
 import oursql
 from argparse import ArgumentParser
-from collections import namedtuple
 
 from utils import find_hashtags
 from dal import (db_connect, ht_db_connect, RecentChangesModel)
@@ -70,7 +69,7 @@ class RecentChangeUpdater(object):
             SELECT *
             FROM recentchanges
             WHERE rc_type = 0
-            AND rc_timestamp > DATE_SUB(NOW(), INTERVAL ? HOUR)
+            AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
             AND rc_comment REGEXP ?
             ORDER BY rc_id DESC'''
         rc_params = (hours, '(^| )#[[:alpha:]]{2}[[:alnum:]]*[[:>:]]')
@@ -160,7 +159,7 @@ class RecentChangeUpdater(object):
             return self.ht_id_map[hashtag]
         query = '''
             INSERT INTO hashtags
-            VALUES (?, ?, NOW() + 0, ?)'''
+            VALUES (?, ?, UTC_TIMESTAMP() + 0, ?)'''
         params = (None, hashtag, rc_timestamp)
         cursor = self._ht_execute(query, params)
         self.ht_id_map[hashtag] = cursor.lastrowid  # Why does this return None?
@@ -180,9 +179,13 @@ def get_argparser():
     return prs
 
 
-if __name__ == '__main__':
+def main():
     parser = get_argparser()
     args = parser.parse_args()
     rc = RecentChangeUpdater(lang=args.lang, debug=args.debug)
     rc.connect()
     rc.update_recentchanges(hours=args.hours)
+
+
+if __name__ == '__main__':
+    main()
