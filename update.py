@@ -14,9 +14,13 @@ from utils import find_hashtags
 from dal import (db_connect, ht_db_connect, RecentChangesModel)
 
 DEFAULT_HOURS = 24
-DEFAULT_LANG =  'en'
+DEFAULT_LANG = 'en'
 
 DEBUG = True
+
+# MySQL translations of https://gist.github.com/mahmoud/237eb20108b5805aed5f
+MYSQL_HASHTAG_RE = '(^|[[:blank:]]|\\.|\\!|\\/)[#＃][[:alnum:]]+[[:>:]]'
+MYSQL_MENTION_RE = '(^|[[:blank:]]|\\.|\\!|\\/)[@][^\s#<>[\]|{}]+[[:>:]]'
 
 
 class RecentChangeUpdater(object):
@@ -25,6 +29,9 @@ class RecentChangeUpdater(object):
         self.debug = debug
         self.ht_id_map = {}
         self.htrc_id_map = {}
+        self.mention_id_map = {}
+        self.htrc_id_map = {}
+        self.htrc_id_mention_map = {}
         self.stats = {'changes_added': 0, 'tags_added': 0}
 
     def connect(self):
@@ -72,7 +79,7 @@ class RecentChangeUpdater(object):
             AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
             AND rc_comment REGEXP ?
             ORDER BY rc_id DESC'''
-        rc_params = (hours, '(^| )#[[:alpha:]]{2}[[:alnum:]]*[[:>:]]')
+        rc_params = (hours, MYSQL_HASHTAG_RE)
         if self.debug:
             print 'Searching for hashtags in last %s hours...' % hours
         cursor = self._wiki_execute(rc_query, rc_params)

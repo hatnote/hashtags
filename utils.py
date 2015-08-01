@@ -2,8 +2,10 @@
 
 import re
 
+# TODO: add allowed starting punctuation
 # From boltons
 HASHTAG_RE = re.compile(r"(?:^|\s)[＃#]{1}(\w+)", re.UNICODE)
+MENTION_RE = re.compile(r"(?:^|\s)[＠ @]{1}([^\s#<>[\]|{}]+)", re.UNICODE)
 
 
 def find_hashtags(string):
@@ -19,3 +21,7 @@ def find_hashtags(string):
     # >>> find_hashtags(u"can't get enough of that dignity chicken #肯德基 woo")
     # [u'\u80af\u5fb7\u57fa']
     return HASHTAG_RE.findall(string)
+
+
+def find_mentions(string):
+    return MENTION_RE.findall(string)
