@@ -1,7 +1,7 @@
 CREATE TABLE /*_*/hashtags (
   ht_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
   ht_text varbinary(767) NOT NULL default '',
-  ht_create_timestamp varbinary(14) NOT NULL default ''),
+  ht_create_timestamp varbinary(14) NOT NULL default '',
   ht_update_timestamp varbinary(14) NOT NULL default '');
 
 CREATE INDEX /*i*/ht_text ON hashtags (ht_text);
@@ -10,7 +10,7 @@ CREATE INDEX /*i*/ht_create_timestamp ON hashtags (ht_create_timestamp);
 CREATE TABLE /*_*/mentions (
   mn_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
   mn_text varbinary(767) NOT NULL default '',
-  mn_create_timestamp varbinary(14) NOT NULL default ''),
+  mn_create_timestamp varbinary(14) NOT NULL default '',
   mn_update_timestamp varbinary(14) NOT NULL default '');
 
 CREATE INDEX /*i*/mn_text ON mentions (mn_text);
