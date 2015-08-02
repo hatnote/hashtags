@@ -1,4 +1,4 @@
-t# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
   Wikipedia Hashtags
   ~~~~~~~~~~~~~~~~~~
@@ -195,7 +195,7 @@ class RecentChangeUpdater(object):
         #     return self.mn_id_map[mention]
         mn_res = self.get_mn_id(mention)
         if mn_res:
-            self.mn_id_map[mn] = mn_res[0][0]
+            self.mn_id_map[mention] = mn_res[0][0]
             if mn_res[0][1] < rc_timestamp:
                 query = '''
                     UPDATE mentions

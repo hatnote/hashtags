@@ -5,7 +5,7 @@ import re
 # TODO: add allowed starting punctuation
 # From boltons
 HASHTAG_RE = re.compile(r"(?:^|\s)[＃#]{1}(\w+)", re.UNICODE)
-MENTION_RE = re.compile(r"(?:^|\s)[＠ @]{1}([^\s#<>[\]|{}]+)", re.UNICODE)
+MENTION_RE = re.compile(r"(?:^|\s)[＠@]{1}([^\s#<>[\]|{}]+)", re.UNICODE)
 
 
 def find_hashtags(string):
