@@ -7,6 +7,19 @@ CREATE TABLE /*_*/hashtags (
 CREATE INDEX /*i*/ht_text ON hashtags (ht_text);
 CREATE INDEX /*i*/ht_create_timestamp ON hashtags (ht_create_timestamp);
 
+CREATE TABLE /*_*/mentions (
+  mn_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  mn_text varbinary(767) NOT NULL default '',
+  mn_create_timestamp varbinary(14) NOT NULL default ''),
+  mn_update_timestamp varbinary(14) NOT NULL default '');
+
+CREATE INDEX /*i*/mn_text ON mentions (mn_text);
+CREATE INDEX /*i*/mn_create_timestamp ON mentions (mn_create_timestamp);
+
+CREATE_TABLE /*_*/mention_recentchanges (
+  mn_id int NOT NULL,
+  mnrc_id int NOT NULL);
+
 CREATE TABLE /*_*/hashtag_recentchanges (
   ht_id int NOT NULL,
   htrc_id int NOT NULL);
