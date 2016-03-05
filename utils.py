@@ -8,6 +8,13 @@ HASHTAG_RE = re.compile(r"(?:^|\s)[＃#]{1}(\w+)", re.UNICODE)
 MENTION_RE = re.compile(r"(?:^|\s)[＠@]{1}([^\s#<>[\]|{}]+)", re.UNICODE)
 
 
+def to_unicode(obj):
+    try:
+        return unicode(obj)
+    except UnicodeDecodeError:
+        return unicode(obj, encoding='utf8')
+
+
 def find_hashtags(string):
     """Finds and returns all hashtags in a string, with the hashmark
     removed. Supports full-width hashmarks for Asian languages and
@@ -20,8 +27,8 @@ def find_hashtags(string):
     # the following works, doctest just struggles with it
     # >>> find_hashtags(u"can't get enough of that dignity chicken #肯德基 woo")
     # [u'\u80af\u5fb7\u57fa']
-    return HASHTAG_RE.findall(string)
+    return HASHTAG_RE.findall(to_unicode(string))
 
 
 def find_mentions(string):
-    return MENTION_RE.findall(string)
+    return MENTION_RE.findall(to_unicode(string))
