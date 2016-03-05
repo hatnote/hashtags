@@ -12,7 +12,7 @@ import oursql
 from collections import namedtuple
 
 HT_DB_HOST = 's1.labsdb'  # enwiki db replica
-HT_DB_NAME = 's52490__hashtags_p'
+HT_DB_NAME = 's52467__hashtags'
 
 DB_CONFIG_PATH = os.path.expanduser('~/replica.my.cnf')  # Available by default on Labs
 

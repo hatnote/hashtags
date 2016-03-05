@@ -37,6 +37,7 @@ class RecentChangeUpdater(object):
         self.htrc_id_mn_map = {}
         self.stats = {'changes_added': 0, 'tags_added': 0, 'mentions_added': 0}
 
+    @tlog.wrap('critical')
     def connect(self):
         wiki_db_name = self.lang + 'wiki_p'
         wiki_db_host = self.lang + 'wiki.labsdb'
@@ -83,18 +84,7 @@ class RecentChangeUpdater(object):
 
     @tlog.wrap('critical', inject_as='log_rec')
     def update_recentchanges(self, hours, log_rec):
-        rc_query = '''
-            SELECT *
-            FROM recentchanges
-            WHERE rc_type = 0
-            AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
-            AND rc_comment REGEXP ?
-            ORDER BY rc_id DESC'''
-        rc_params = (hours, MYSQL_HASHTAG_RE)
-        if self.debug:
-            print 'Searching for hashtags in last %s hours...' % hours
-        cursor = self._wiki_execute(rc_query, rc_params)
-        changes = cursor.fetchall()
+        changes = self.find_recentchanges(hours)
         self.stats['total_changes'] = len(changes)
         for change in changes:
             change = RecentChangesModel(*change)
@@ -123,17 +113,10 @@ class RecentChangeUpdater(object):
         new_mentions = self.stats['mentions_added']
         changes = self.stats['total_changes']
         new_changes = self.stats['changes_added']
-        if self.debug:
-            print 'Results'
-            print '======='
-            print '%s - %s' % (timestamp, self.lang)
-            print 'Tags: %s new (of %s)' % (new_tags, tags)
-            print 'Mentions: %s new (of %s)' % (new_mentions, mentions)
-            print 'Changes: %s new (of %s)' % (new_changes, changes)
-        else:
-            log_rec.success('Searched {lang} for {hours} hours, and found {new_changes} with {new_tags} tags and {new_mentions} mentions')
+        log_rec.success('Searched {lang} for {hours} hours, and found {new_changes} revs with {new_tags} tags and {new_mentions} mentions')
         return self.stats
 
+    @tlog.wrap('debug')
     def _update_ht_rc_mapping(self):
         for htrc_id, hashtags in self.htrc_id_map.items():
             for hashtag in hashtags:
@@ -151,12 +134,13 @@ class RecentChangeUpdater(object):
                                             self.htrc_id_map.values()
                                             for h in hs]))
 
+    @tlog.wrap('debug')
     def _update_mn_rc_mapping(self):
         for htrc_id, mentions in self.htrc_id_mn_map.items():
             for mention in mentions:
                 mn_id = self.mn_id_map[mention]
                 if not mn_id:
-                    raise Exception('Missing mn_id')
+                    raise Exception('missing mn_id')
                 query = '''
                     INSERT INTO mention_recentchanges
                     VALUES (?, ?)'''
@@ -166,7 +150,21 @@ class RecentChangeUpdater(object):
         self.stats['total_mentions'] = len(set([m for ms in
                                                 self.htrc_id_mn_map.values()
                                                 for m in ms]))
+    @tlog.wrap('debug')
+    def find_recentchanges(self, hours):
+        rc_query = '''
+            SELECT *
+            FROM recentchanges
+            WHERE rc_type = 0
+            AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
+            AND rc_comment REGEXP ?
+            ORDER BY rc_id DESC'''
+        rc_params = (hours, MYSQL_HASHTAG_RE)
+        cursor = self._wiki_execute(rc_query, rc_params)
+        changes = cursor.fetchall()
+        return changes
 
+    @tlog.wrap('debug')
     def add_recentchange(self, rc):
         query = '''
             SELECT htrc_id
@@ -187,6 +185,7 @@ class RecentChangeUpdater(object):
         self.stats['changes_added'] += 1
         return cursor.lastrowid
 
+    @tlog.wrap('debug')
     def get_mn_id(self, mention):
         query = '''
             SELECT mn_id, mn_update_timestamp
@@ -198,6 +197,7 @@ class RecentChangeUpdater(object):
         mn_res = cursor.fetchall()
         return mn_res
 
+    @tlog.wrap('debug')
     def get_ht_id(self, hashtag):
         query = '''
             SELECT ht_id, ht_update_timestamp
@@ -209,6 +209,7 @@ class RecentChangeUpdater(object):
         ht_res = cursor.fetchall()
         return ht_res
 
+    @tlog.wrap('debug')
     def add_mention(self, mention, rc_timestamp):
         # if mention in self.mn_id_map:
         #     return self.mn_id_map[mention]
@@ -237,6 +238,7 @@ class RecentChangeUpdater(object):
         self.stats['tags_added'] += 1
         return self.mn_id_map[mention]
 
+    @tlog.wrap('debug')
     def add_hashtag(self, hashtag, rc_timestamp):
         # if hashtag in self.ht_id_map:
         #     return self.ht_id_map[hashtag]
@@ -277,6 +279,9 @@ def get_argparser():
 def main():
     parser = get_argparser()
     args = parser.parse_args()
+    if args.debug:
+        import log
+        log.set_debug(True)
     rc = RecentChangeUpdater(lang=args.lang, debug=args.debug)
     rc.connect()
     rc.update_recentchanges(hours=args.hours)
