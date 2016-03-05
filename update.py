@@ -9,14 +9,17 @@
 
 import oursql
 from argparse import ArgumentParser
+from time import strftime
 
 from utils import find_hashtags, find_mentions
 from dal import (db_connect, ht_db_connect, RecentChangesModel)
 
+from log import tlog
+
 DEFAULT_HOURS = 24
 DEFAULT_LANG = 'en'
 
-DEBUG = True
+DEBUG = False
 
 # MySQL translations of https://gist.github.com/mahmoud/237eb20108b5805aed5f
 MYSQL_HASHTAG_RE = '(^|[[:blank:]]|\\.|\\!|\\/)[#＃][[:alnum:]]+[[:>:]]'
@@ -78,7 +81,8 @@ class RecentChangeUpdater(object):
             pass
         return ht_cursor
 
-    def update_recentchanges(self, hours=DEFAULT_HOURS):
+    @tlog.wrap('critical', inject_as='log_rec')
+    def update_recentchanges(self, hours, log_rec):
         rc_query = '''
             SELECT *
             FROM recentchanges
@@ -107,12 +111,27 @@ class RecentChangeUpdater(object):
                 self.add_mention(mention, change.rc_timestamp)
         self._update_ht_rc_mapping()
         self._update_mn_rc_mapping()
+        timestamp = strftime('%Y-%m-%d %H:%M:%S')
+        tags = self.stats['total_tags']
+        new_tags = self.stats['tags_added']
+        log_rec['lang'] = self.lang
+        log_rec['hours'] = hours
+        log_rec['new_changes'] = self.stats['total_changes']
+        log_rec['new_tags'] = self.stats['tags_added']
+        log_rec['new_mentions'] = self.stats['mentions_added']
+        mentions = self.stats['total_mentions']
+        new_mentions = self.stats['mentions_added']
+        changes = self.stats['total_changes']
+        new_changes = self.stats['changes_added']
         if self.debug:
             print 'Results'
             print '======='
-            print 'Tags: %s new (of %s)' % (self.stats['tags_added'], self.stats['total_tags'])
-            print 'Mentions: %s new (of %s)' % (self.stats['mentions_added'], self.stats['total_mentions'])
-            print 'Changes: %s new (of %s)' % (self.stats['changes_added'], self.stats['total_changes'])
+            print '%s - %s' % (timestamp, self.lang)
+            print 'Tags: %s new (of %s)' % (new_tags, tags)
+            print 'Mentions: %s new (of %s)' % (new_mentions, mentions)
+            print 'Changes: %s new (of %s)' % (new_changes, changes)
+        else:
+            log_rec.success('Searched {lang} for {hours} hours, and found {new_changes} with {new_tags} tags and {new_mentions} mentions')
         return self.stats
 
     def _update_ht_rc_mapping(self):
