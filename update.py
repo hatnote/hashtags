@@ -14,6 +14,8 @@ from time import strftime
 from utils import find_hashtags, find_mentions
 from dal import (db_connect, ht_db_connect, RecentChangesModel)
 
+from log import tlog
+
 DEFAULT_HOURS = 24
 DEFAULT_LANG = 'en'
 
@@ -79,7 +81,8 @@ class RecentChangeUpdater(object):
             pass
         return ht_cursor
 
-    def update_recentchanges(self, hours=DEFAULT_HOURS):
+    @tlog.wrap('critical', inject_as='log_rec')
+    def update_recentchanges(self, hours, log_rec):
         rc_query = '''
             SELECT *
             FROM recentchanges
@@ -111,6 +114,11 @@ class RecentChangeUpdater(object):
         timestamp = strftime('%Y-%m-%d %H:%M:%S')
         tags = self.stats['total_tags']
         new_tags = self.stats['tags_added']
+        log_rec['lang'] = self.lang
+        log_rec['hours'] = hours
+        log_rec['new_changes'] = self.stats['total_changes']
+        log_rec['new_tags'] = self.stats['tags_added']
+        log_rec['new_mentions'] = self.stats['mentions_added']
         mentions = self.stats['total_mentions']
         new_mentions = self.stats['mentions_added']
         changes = self.stats['total_changes']
@@ -123,18 +131,7 @@ class RecentChangeUpdater(object):
             print 'Mentions: %s new (of %s)' % (new_mentions, mentions)
             print 'Changes: %s new (of %s)' % (new_changes, changes)
         else:
-            log_line = ('{time} - {lang} - {hours}h - tags: {tags} '
-                        '({new_tags}) mentions: {mentions} ({new_mentions}) '
-                        'changes: {changes} ({new_changes})')
-            print log_line.format(time=timestamp,
-                                  lang=self.lang,
-                                  hours=hours,
-                                  tags=tags,
-                                  new_tags=new_tags,
-                                  mentions=mentions,
-                                  new_mentions=new_mentions,
-                                  changes=changes,
-                                  new_changes=new_changes)
+            log_rec.success('Searched {lang} for {hours} hours, and found {new_changes} with {new_tags} tags and {new_mentions} mentions')
         return self.stats
 
     def _update_ht_rc_mapping(self):
