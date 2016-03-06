@@ -6,11 +6,16 @@
   Some scripts for hashtags in Wikipedia edit comments.
 
 """
+import os
+import sys
+import json
 import uuid
+import traceback
 from time import strftime
+from pipes import quote as shell_quote
 from argparse import ArgumentParser
 
-import os
+
 import oursql
 
 from common import RC_COLUMNS
@@ -18,7 +23,7 @@ from utils import find_hashtags, find_mentions
 from dal import db_connect, ht_db_connect, RecentChangesModel
 from log import tlog
 
-RUN_ID = uuid.uuid4()
+RUN_UUID = uuid.uuid4()
 
 DEFAULT_HOURS = 24
 DEFAULT_LANG = 'en'
@@ -284,17 +289,74 @@ def get_argparser():
     prs.add_argument('--debug', default=DEBUG, action='store_true')
     return prs
 
+
+def get_command_str():
+    return ' '.join([sys.executable] + [shell_quote(v) for v in sys.argv])
+
+
+class RunLogDAL(object):
+    def __init__(self):
+        pass
+
+    def add_start_record(self, lang, command=None, run_uuid=None):
+        if not command:
+            command = get_command_str()
+        if len(command) > 1024:
+            command = command[:1024]
+        if not run_uuid:
+            run_uuid = RUN_UUID
+        params = (lang, command, run_uuid)
+        conn = ht_db_connect()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute('INSERT INTO start_log'
+                               ' (lang, command, run_uuid)'
+                               ' VALUES (?, ?, ?)', params)
+        finally:
+            conn.close()
+        return
+
+    def add_complete_record(self, lang, output=None, run_uuid=None):
+        output = output or ''
+        if len(output) > 1024:
+            output = output[:4096]
+        if not run_uuid:
+            run_uuid = RUN_UUID
+        params = (lang, output, run_uuid)
+        conn = ht_db_connect()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute('INSERT INTO complete_log'
+                               ' (lang, output, run_uuid)'
+                               ' VALUES (?, ?, ?)', params)
+        finally:
+            conn.close()
+        return
+
+
 @tlog.wrap('critical')
 def main():
     tlog.critical('start').success('started {0}', os.getpid())
     parser = get_argparser()
     args = parser.parse_args()
-    if args.debug:
-        import log
-        log.set_debug(True)
-    rc = RecentChangeUpdater(lang=args.lang, debug=args.debug)
-    rc.connect()
-    rc.update_recentchanges(hours=args.hours)
+
+    run_logger = RunLogDAL()
+    run_logger.add_start_record(lang=args.lang)
+    output = '{}'
+    try:
+        if args.debug:
+            import log
+            log.set_debug(True)
+
+        rcu = RecentChangeUpdater(lang=args.lang, debug=args.debug)
+        rcu.connect()
+        rcu.update_recentchanges(hours=args.hours)
+        output = json.dumps(rcu.stats)
+    except Exception:
+        output = json.dumps({'error': traceback.format_exc()})
+        raise
+    finally:
+        run_logger.add_complete_record(lang=args.lang, output=output)
 
 
 if __name__ == '__main__':
