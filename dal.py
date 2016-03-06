@@ -18,7 +18,6 @@ DB_CONFIG_PATH = os.path.expanduser('~/replica.my.cnf')  # Available by default 
 
 _rc_columns = ['rc_id',
                'rc_timestamp',
-               'rc_cur_time',
                'rc_user',
                'rc_user_text',
                'rc_namespace',

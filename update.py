@@ -89,9 +89,9 @@ class RecentChangeUpdater(object):
         for change in changes:
             change = RecentChangesModel(*change)
             hashtags = find_hashtags(change.rc_comment)
-            hashtags = [hashtag.lower() for hashtag in hashtags]
+            hashtags = [ht.lower().encode('utf-8') for ht in hashtags]
             mentions = find_mentions(change.rc_comment)
-            mentions = [mention.lower() for mention in mentions]
+            mentions = [m.lower().encode('utf-8') for m in mentions]
             htrc_id = self.add_recentchange(change)
             self.htrc_id_map[htrc_id] = hashtags
             self.htrc_id_mn_map[htrc_id] = mentions
@@ -113,7 +113,8 @@ class RecentChangeUpdater(object):
         new_mentions = self.stats['mentions_added']
         changes = self.stats['total_changes']
         new_changes = self.stats['changes_added']
-        log_rec.success('Searched {lang} for {hours} hours, and found {new_changes} revs with {new_tags} tags and {new_mentions} mentions')
+        log_rec.success('Searched {lang} for {hours} hours, and found {new_changes}'
+                        ' revs with {new_tags} tags and {new_mentions} mentions')
         return self.stats
 
     @tlog.wrap('debug')
@@ -153,7 +154,30 @@ class RecentChangeUpdater(object):
     @tlog.wrap('debug')
     def find_recentchanges(self, hours):
         rc_query = '''
-            SELECT *
+            SELECT rc_id,
+                   rc_timestamp,
+                   rc_user,
+                   rc_user_text,
+                   rc_namespace,
+                   rc_title,
+                   rc_comment,
+                   rc_minor,
+                   rc_bot,
+                   rc_new,
+                   rc_cur_id,
+                   rc_this_oldid,
+                   rc_last_oldid,
+                   rc_type,
+                   rc_source,
+                   rc_patrolled,
+                   rc_ip,
+                   rc_old_len,
+                   rc_new_len,
+                   rc_deleted,
+                   rc_logid,
+                   rc_log_type,
+                   rc_log_action,
+                   rc_params
             FROM recentchanges
             WHERE rc_type = 0
             AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
@@ -178,8 +202,33 @@ class RecentChangeUpdater(object):
         if htrc_id:
             return htrc_id[0][0]
         query = '''
-            INSERT INTO recentchanges
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+            INSERT INTO recentchanges (htrc_id,
+                                       htrc_lang,
+                                       rc_id,
+                                       rc_timestamp,
+                                       rc_user,
+                                       rc_user_text,
+                                       rc_namespace,
+                                       rc_title,
+                                       rc_comment,
+                                       rc_minor,
+                                       rc_bot,
+                                       rc_new,
+                                       rc_cur_id,
+                                       rc_this_oldid,
+                                       rc_last_oldid,
+                                       rc_type,
+                                       rc_source,
+                                       rc_patrolled,
+                                       rc_ip,
+                                       rc_old_len,
+                                       rc_new_len,
+                                       rc_deleted,
+                                       rc_logid,
+                                       rc_log_type,
+                                       rc_log_action,
+                                       rc_params)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
         params = (None, self.lang) + rc
         cursor = self._ht_execute(query, params)
         self.stats['changes_added'] += 1
