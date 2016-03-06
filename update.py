@@ -6,16 +6,19 @@
   Some scripts for hashtags in Wikipedia edit comments.
 
 """
+import uuid
+from time import strftime
+from argparse import ArgumentParser
 
 import os
 import oursql
-from argparse import ArgumentParser
-from time import strftime
 
+from common import RC_COLUMNS
 from utils import find_hashtags, find_mentions
-from dal import (db_connect, ht_db_connect, RecentChangesModel)
-
+from dal import db_connect, ht_db_connect, RecentChangesModel
 from log import tlog
+
+RUN_ID = uuid.uuid4()
 
 DEFAULT_HOURS = 24
 DEFAULT_LANG = 'en'
@@ -154,36 +157,15 @@ class RecentChangeUpdater(object):
                                                 for m in ms]))
     @tlog.wrap('debug')
     def find_recentchanges(self, hours):
-        rc_query = '''
-            SELECT rc_id,
-                   rc_timestamp,
-                   rc_user,
-                   rc_user_text,
-                   rc_namespace,
-                   rc_title,
-                   rc_comment,
-                   rc_minor,
-                   rc_bot,
-                   rc_new,
-                   rc_cur_id,
-                   rc_this_oldid,
-                   rc_last_oldid,
-                   rc_type,
-                   rc_source,
-                   rc_patrolled,
-                   rc_ip,
-                   rc_old_len,
-                   rc_new_len,
-                   rc_deleted,
-                   rc_logid,
-                   rc_log_type,
-                   rc_log_action,
-                   rc_params
+        rc_cols_str = ', '.join(RC_COLUMNS)
+        rc_query_tmpl = '''
+            SELECT %s
             FROM recentchanges
             WHERE rc_type = 0
             AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
             AND rc_comment REGEXP ?
             ORDER BY rc_id DESC'''
+        rc_query = rc_query_tmpl % rc_cols_str
         rc_params = (hours, MYSQL_HASHTAG_RE)
         cursor = self._wiki_execute(rc_query, rc_params)
         changes = cursor.fetchall()
@@ -202,34 +184,11 @@ class RecentChangeUpdater(object):
         htrc_id = cursor.fetchall()
         if htrc_id:
             return htrc_id[0][0]
-        query = '''
-            INSERT INTO recentchanges (htrc_id,
-                                       htrc_lang,
-                                       rc_id,
-                                       rc_timestamp,
-                                       rc_user,
-                                       rc_user_text,
-                                       rc_namespace,
-                                       rc_title,
-                                       rc_comment,
-                                       rc_minor,
-                                       rc_bot,
-                                       rc_new,
-                                       rc_cur_id,
-                                       rc_this_oldid,
-                                       rc_last_oldid,
-                                       rc_type,
-                                       rc_source,
-                                       rc_patrolled,
-                                       rc_ip,
-                                       rc_old_len,
-                                       rc_new_len,
-                                       rc_deleted,
-                                       rc_logid,
-                                       rc_log_type,
-                                       rc_log_action,
-                                       rc_params)
+        rc_cols_str = ', '.join(RC_COLUMNS)
+        query_tmpl = '''
+            INSERT INTO recentchanges (htrc_id, htrc_lang, %s)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+        query = query_tmpl % rc_cols_str
         params = (None, self.lang) + rc
         cursor = self._ht_execute(query, params)
         self.stats['changes_added'] += 1
@@ -336,7 +295,7 @@ def main():
     rc = RecentChangeUpdater(lang=args.lang, debug=args.debug)
     rc.connect()
     rc.update_recentchanges(hours=args.hours)
-    
+
 
 if __name__ == '__main__':
     main()

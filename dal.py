@@ -16,34 +16,34 @@ HT_DB_NAME = 's52467__hashtags'
 
 DB_CONFIG_PATH = os.path.expanduser('~/replica.my.cnf')  # Available by default on Labs
 
-_rc_columns = ['rc_id',
-               'rc_timestamp',
-               'rc_user',
-               'rc_user_text',
-               'rc_namespace',
-               'rc_title',
-               'rc_comment',
-               'rc_minor',
-               'rc_bot',
-               'rc_new',
-               'rc_cur_id',
-               'rc_this_oldid',
-               'rc_last_oldid',
-               'rc_type',
-               'rc_source',
-               'rc_patrolled',
-               'rc_ip',
-               'rc_old_len',
-               'rc_new_len',
-               'rc_deleted',
-               'rc_logid',
-               'rc_log_type',
-               'rc_log_action',
-               'rc_params']
+RC_COLUMNS = ['rc_id',
+              'rc_timestamp',
+              'rc_user',
+              'rc_user_text',
+              'rc_namespace',
+              'rc_title',
+              'rc_comment',
+              'rc_minor',
+              'rc_bot',
+              'rc_new',
+              'rc_cur_id',
+              'rc_this_oldid',
+              'rc_last_oldid',
+              'rc_type',
+              'rc_source',
+              'rc_patrolled',
+              'rc_ip',
+              'rc_old_len',
+              'rc_new_len',
+              'rc_deleted',
+              'rc_logid',
+              'rc_log_type',
+              'rc_log_action',
+              'rc_params']
 
 
-RecentChangesModel = namedtuple('RC', _rc_columns)
-HashtagRecentChangesModel = namedtuple('HTRC', ['htrc_id', 'htrc_lang'] + _rc_columns)
+RecentChangesModel = namedtuple('RC', RC_COLUMNS)
+HashtagRecentChangesModel = namedtuple('HTRC', ['htrc_id', 'htrc_lang'] + RC_COLUMNS)
 
 
 def db_connect(db, host, read_default_file=DB_CONFIG_PATH):
