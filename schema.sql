@@ -1,3 +1,26 @@
+
+-- begin run logs
+
+CREATE TABLE start_log (start_log_id integer not null auto_increment,
+                       start_timestamp TIMESTAMP,
+                       lang varchar(8),
+                       command varchar(1024),
+                       run_uuid varchar(36),
+                       PRIMARY KEY (start_log_id),
+                       KEY (start_timestamp),
+                       KEY (lang));
+
+CREATE TABLE complete_log (complete_log_id integer not null auto_increment,
+                           complete_timestamp TIMESTAMP,
+                           lang varchar(8),
+                           output varchar(4096),
+                           run_uuid varchar(36),
+                           PRIMARY KEY (complete_log_id),
+                           KEY (complete_timestamp),
+                           KEY (lang));
+
+-- end run logs
+
 CREATE TABLE /*_*/hashtags (
   ht_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
   ht_text varbinary(767) NOT NULL default '',
