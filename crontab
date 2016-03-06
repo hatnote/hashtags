@@ -27,26 +27,26 @@
 #
 
 # Variables
-JOB_NAME=HashtagUpdate
-PYTHON_BIN=/data/project/ifttt/www/python/venv/bin/python
-UPDATE_SCRIPT=/data/project/ifttt/hashtags/update.py
-CRON_LOG_PATH=/data/project/ifttt/hashtags/logs/cron.txt
-SCRIPT_LOG=/data/project/ifttt/hashtags/logs/update_log.txt
+PYTHON_BIN=/data/project/hashtags/virtualenvs/hashtags/bin/python
+UPDATE_SCRIPT=/data/project/hashtags/hashtags/update.py
+CRON_LOG_PATH=/data/project/hashtags/hashtags/logs/cron.txt
+LOGPATH=/data/project/hashtags/hashtags/logs
  
 # m h  dom mon dow   command
-*/10 * * * *  jsub -o $SCRIPT_LOG -N en$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang en >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N ca$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ca >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N es$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang es >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N nl$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang nl >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N fr$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang fr >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N fi$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang fi >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N it$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang it >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N zh$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang zh >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N no$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang no >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N ja$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ja >> $CRON_LOG_PATH 
-*/15 * * * *  jsub -o $SCRIPT_LOG -N ro$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ro >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N pl$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang pl >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N pt$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang pt >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N ru$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ru >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N de$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang de >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $SCRIPT_LOG -N sv$JOB_NAME $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang sv >> $CRON_LOG_PATH
+*/10 * * * *  jsub -o $LOGPATH/en_out.txt -N enHashtagUpdate -e $LOGPATH/en_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang en >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/ca_out.txt -N caHashtagUpdate -e $LOGPATH/ca_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ca >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/es_out.txt -N esHashtagUpdate -e $LOGPATH/es_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang es >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/nl_out.txt -N nlHashtagUpdate -e $LOGPATH/nl_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang nl >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/fr_out.txt -N frHashtagUpdate -e $LOGPATH/fr_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang fr >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/fi_out.txt -N fiHashtagUpdate -e $LOGPATH/fi_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang fi >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/it_out.txt -N itHashtagUpdate -e $LOGPATH/it_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang it >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/zh_out.txt -N zhHashtagUpdate -e $LOGPATH/zh_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang zh >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/no_out.txt -N noHashtagUpdate -e $LOGPATH/no_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang no >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/ja_out.txt -N jaHashtagUpdate -e $LOGPATH/ja_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ja >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/ro_out.txt -N roHashtagUpdate -e $LOGPATH/ro_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ro >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/pl_out.txt -N plHashtagUpdate -e $LOGPATH/pl_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang pl >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/pt_out.txt -N ptHashtagUpdate -e $LOGPATH/pt_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang pt >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/ru_out.txt -N ruHashtagUpdate -e $LOGPATH/ru_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ru >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/de_out.txt -N deHashtagUpdate -e $LOGPATH/de_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang de >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/sv_out.txt -N deHashtagUpdate -e $LOGPATH/sv_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang sv >> $CRON_LOG_PATH
+

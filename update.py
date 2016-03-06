@@ -7,6 +7,7 @@
 
 """
 
+import os
 import oursql
 from argparse import ArgumentParser
 from time import strftime
@@ -324,8 +325,9 @@ def get_argparser():
     prs.add_argument('--debug', default=DEBUG, action='store_true')
     return prs
 
-
+@tlog.wrap('critical')
 def main():
+    tlog.critical('start').success('started {0}', os.getpid())
     parser = get_argparser()
     args = parser.parse_args()
     if args.debug:
@@ -334,7 +336,7 @@ def main():
     rc = RecentChangeUpdater(lang=args.lang, debug=args.debug)
     rc.connect()
     rc.update_recentchanges(hours=args.hours)
-
+    
 
 if __name__ == '__main__':
     main()
