@@ -48,5 +48,6 @@ LOGPATH=/data/project/hashtags/hashtags/logs
 */16 * * * *  jsub -o $LOGPATH/pt_out.txt -N ptHashtagUpdate -e $LOGPATH/pt_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang pt >> $CRON_LOG_PATH
 */15 * * * *  jsub -o $LOGPATH/ru_out.txt -N ruHashtagUpdate -e $LOGPATH/ru_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang ru >> $CRON_LOG_PATH
 */16 * * * *  jsub -o $LOGPATH/de_out.txt -N deHashtagUpdate -e $LOGPATH/de_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang de >> $CRON_LOG_PATH
-*/15 * * * *  jsub -o $LOGPATH/sv_out.txt -N deHashtagUpdate -e $LOGPATH/sv_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang sv >> $CRON_LOG_PATH
+*/15 * * * *  jsub -o $LOGPATH/sv_out.txt -N svHashtagUpdate -e $LOGPATH/sv_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang sv >> $CRON_LOG_PATH
+*/16 * * * *  jsub -o $LOGPATH/pa_out.txt -N paHashtagUpdate -e $LOGPATH/pa_err.txt $PYTHON_BIN $UPDATE_SCRIPT --hours 1 --lang pa >> $CRON_LOG_PATH
 
