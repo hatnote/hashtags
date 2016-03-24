@@ -18,12 +18,11 @@ from argparse import ArgumentParser
 
 import oursql
 
-from common import RC_COLUMNS
 from utils import find_hashtags, find_mentions
-from dal import db_connect, ht_db_connect, RecentChangesModel
+from dal import db_connect, ht_db_connect, RecentChangesModel, RC_COLUMNS
 from log import tlog
 
-RUN_UUID = uuid.uuid4()
+RUN_UUID = str(uuid.uuid4())
 
 DEFAULT_HOURS = 24
 DEFAULT_LANG = 'en'
@@ -166,8 +165,8 @@ class RecentChangeUpdater(object):
         rc_query_tmpl = '''
             SELECT %s
             FROM recentchanges
-            WHERE rc_type = 0
-            AND rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
+            WHERE rc_timestamp > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? HOUR)
+            AND rc_type != 5
             AND rc_comment REGEXP ?
             ORDER BY rc_id DESC'''
         rc_query = rc_query_tmpl % rc_cols_str
