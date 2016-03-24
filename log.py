@@ -9,12 +9,13 @@ class FixedFileEmitter(FileEmitter):
         self.encoding = encoding
         super(FixedFileEmitter, self).__init__(filepath, encoding, **kwargs)
 
-LOGFILE = 'lithoxyl.log'  # TODO: where?
+CUR_PATH = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE_PATH = os.path.join(CUR_PATH, 'logs', 'update_log.txt')
 
 tlog = Logger('toplog')
 
 file_fmt = Formatter('{status_char}{end_local_iso8601_noms_notz} - {duration_secs}s - {record_name} - {message}')
-file_emt = FixedFileEmitter(LOGFILE)
+file_emt = FixedFileEmitter(LOG_FILE_PATH)
 file_filter = ThresholdFilter(success='critical',
                               failure='info',
                               exception='debug')
