@@ -19,7 +19,7 @@ from argparse import ArgumentParser
 import oursql
 
 from utils import find_hashtags, find_mentions
-from dal import db_connect, ht_db_connect, RecentChangesModel, RC_COLUMNS
+from dal import wiki_db_connect, ht_db_connect, RecentChangesModel, RC_COLUMNS
 from log import tlog
 
 RUN_UUID = str(uuid.uuid4())
@@ -47,9 +47,7 @@ class RecentChangeUpdater(object):
 
     @tlog.wrap('critical')
     def connect(self):
-        wiki_db_name = self.lang + 'wiki_p'
-        wiki_db_host = self.lang + 'wiki.labsdb'
-        self.wiki_connect = db_connect(wiki_db_name, wiki_db_host)
+        self.wiki_connect = wiki_db_connect(self.lang)
         self.ht_connect = ht_db_connect()
 
     def _wiki_execute(self, query, params, as_dict=False):
