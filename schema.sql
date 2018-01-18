@@ -39,7 +39,7 @@ CREATE TABLE /*_*/mentions (
 CREATE INDEX /*i*/mn_text ON mentions (mn_text);
 CREATE INDEX /*i*/mn_create_timestamp ON mentions (mn_create_timestamp);
 
-CREATE_TABLE /*_*/mention_recentchanges (
+CREATE TABLE /*_*/mention_recentchanges (
   mn_id int NOT NULL,
   mnrc_id int NOT NULL);
 
