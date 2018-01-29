@@ -60,8 +60,8 @@ def db_connect(db, host, read_default_file=DB_CONFIG_PATH):
     return connection
 
 def wiki_db_connect(lang):
-    wiki_db_name = self.lang + 'wiki_p'
-    wiki_db_host = self.lang + WIKI_DB_DOMAIN
+    wiki_db_name = lang + 'wiki_p'
+    wiki_db_host = lang + 'wiki.' + WIKI_DB_DOMAIN
     return db_connect(wiki_db_name, wiki_db_host)
 
 
