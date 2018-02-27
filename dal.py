@@ -11,12 +11,13 @@ import os
 import oursql
 from collections import namedtuple
 
+HT_DB_BASE_HOST = 'db.svc.eqiad.wmflabs'
 HT_DB_HOST = 'tools.db.svc.eqiad.wmflabs'
 HT_DB_NAME = 's52467__new_hashtags'
 
 # Tools can use two db services:
-#   *.analytics.db.svc.eqiad.wmflabs (for big queries)
-#   *.web.db.svc.eqiad.wmflabs (for quick queries)
+#   *.analytics.db.svc.eqiad.wmflabs (for big queries) 
+#   *.web.db.svc.eqiad.wmflabs (for quick queries)  # tools?
 WIKI_DB_DOMAIN = 'web.db.svc.eqiad.wmflabs'
 
 DB_CONFIG_PATH = os.path.expanduser('~/replica.my.cnf')  # Available by default on Labs
@@ -59,9 +60,9 @@ def db_connect(db, host, read_default_file=DB_CONFIG_PATH):
                                 use_unicode=False)
     return connection
 
-def wiki_db_connect(lang):
+def wiki_db_connect(lang, db_host='tools'):
     wiki_db_name = lang + 'wiki_p'
-    wiki_db_host = lang + 'wiki.' + WIKI_DB_DOMAIN
+    wiki_db_host = '%swiki.%s.%s' % (lang, db_host, HT_DB_BASE_HOST)
     return db_connect(wiki_db_name, wiki_db_host)
 
 

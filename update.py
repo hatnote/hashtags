@@ -47,7 +47,7 @@ class RecentChangeUpdater(object):
 
     @tlog.wrap('critical')
     def connect(self):
-        self.wiki_connect = wiki_db_connect(self.lang)
+        self.wiki_connect = wiki_db_connect(self.lang, db_host='analytics')
         self.ht_connect = ht_db_connect()
 
     def _wiki_execute(self, query, params, as_dict=False):

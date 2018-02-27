@@ -13,7 +13,7 @@ LOG_FILE_PATH = os.path.join(CUR_PATH, 'logs', 'update_log.txt')
 
 tlog = Logger('toplog')
 
-file_fmt = SensibleFormatter('{status_char}{end_local_iso8601_noms_notz} - {duration_secs}s - {record_name} - {message}')
+file_fmt = SensibleFormatter('{status_char}{iso_end_local_noms_notz} - {duration_s}s - {action_name} - {event_message}')
 file_emt = FixedFileEmitter(LOG_FILE_PATH)
 file_filter = SensibleFilter(success='critical',
                               failure='info',
