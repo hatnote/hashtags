@@ -10,6 +10,8 @@ import os
 import sys
 import json
 import uuid
+import time
+import random
 import traceback
 from time import strftime
 from pipes import quote as shell_quote
@@ -283,6 +285,7 @@ def get_argparser():
     prs = ArgumentParser(description=desc)
     prs.add_argument('--lang', default=DEFAULT_LANG)
     prs.add_argument('--hours', default=DEFAULT_HOURS)
+    prs.add_argument('--jitter', type=int, default=0)
     prs.add_argument('--debug', default=DEBUG, action='store_true')
     return prs
 
@@ -333,10 +336,13 @@ class RunLogDAL(object):
 
 @tlog.wrap('critical')
 def main():
-    tlog.critical('start').success('started {0}', os.getpid())
-    parser = get_argparser()
-    args = parser.parse_args()
-
+    with tlog.critical('start') as act:
+        parser = get_argparser()
+        args = parser.parse_args()
+        wait = random.randint(0, args.jitter)
+        act.success('started pid {process_id}, fetch for {lang} beginning in {wait} seconds', lang=args.lang, wait=wait)
+        time.sleep(wait)
+    
     run_logger = RunLogDAL()
     run_logger.add_start_record(lang=args.lang)
     output = '{}'
